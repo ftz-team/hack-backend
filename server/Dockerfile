@@ -6,4 +6,4 @@ COPY requirements.txt /server/
 RUN pip install --upgrade pip && pip install -r requirements.txt
 ADD . /server/ 
 RUN python manage.py collectstatic --noinput
-EXPOSE 7000
+EXPOSE 8000
