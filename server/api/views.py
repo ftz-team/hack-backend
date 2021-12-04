@@ -2,38 +2,29 @@
 # from django.shortcuts import render
 # from django.db.models import query
 # from django.http import request
-# from rest_framework import generics, views
+from rest_framework import generics, views
 # from rest_framework.response import Response
-# from rest_framework.permissions import AllowAny, IsAuthenticated
-# from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework import status
-# from rest_framework import filters
-# from datetime import date, timedelta
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework import filters
 
 from core.models import *
 from .serializers import *
 
 
-# def list_to_queryset(model, data):
-#     from django.db.models.base import ModelBase
-
-#     if not isinstance(model, ModelBase):
-#         raise ValueError(
-#             "%s must be Model" % model
-#         )
-#     if not isinstance(data, list):
-#         raise ValueError(
-#             "%s must be List Object" % data
-#         )
-
-#     pk_list = [obj.pk for obj in data]
-#     return model.objects.filter(pk__in=pk_list)
+class GetEventsView(generics.ListAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'description']
 
 
-# class CreateProjectView(generics.CreateAPIView):
-#     queryset = Project.objects.all()
-#     serializer_class = CreateProjectSerializer
-#     permission_classes = [AllowAny]
+class GetUserDataView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
 
 # class GetProjectsView(generics.ListAPIView):
