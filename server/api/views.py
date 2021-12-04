@@ -3,10 +3,11 @@
 # from django.db.models import query
 # from django.http import request
 from rest_framework import generics, views
-# from rest_framework.response import Response
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
+from rest_framework.fields import CurrentUserDefault
 from rest_framework import filters
 
 from core.models import *
@@ -21,10 +22,20 @@ class GetEventsView(generics.ListAPIView):
     search_fields = ['name', 'description']
 
 
-class GetUserDataView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+class GetUserDataView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            data = UserSerializer(request.user).data
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'status': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class GetUserDataView(generics.RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [AllowAny]
 
 
 # class GetProjectsView(generics.ListAPIView):
@@ -118,18 +129,3 @@ class GetUserDataView(generics.RetrieveAPIView):
 #     filterset_fields = []
 #     search_fields = ['name', ]
 
-
-# class AddMember(views.APIView):
-#     permission_classes = [AllowAny]
-#     def post(self, request):
-#         try:
-#             employee = Employee.objects.get(pk=request.data['employee_id'])
-#             role = Role.objects.get(pk=request.data['role_id'])
-#             project = Project.objects.get(pk=request.data['project_id'])
-#             m = Member(employee=employee, role=role)
-#             m.save()
-#             project.members.add(m)
-#             project.save()
-#             return Response({'status': 'OK'}, status=status.HTTP_200_OK)
-#         except Exception:
-#             return Response({'status': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
