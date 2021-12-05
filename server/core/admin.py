@@ -14,3 +14,23 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name')
+
+
+@admin.register(Stage1)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name')
+
+
+@admin.register(Stage2)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name')
+
+
+@admin.register(Stage3)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name')
+
+
+@admin.register(Stage4)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name')

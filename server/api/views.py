@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
-from rest_framework.fields import CurrentUserDefault
 from rest_framework import filters
 
 from core.models import *
@@ -27,105 +26,94 @@ class GetUserDataView(views.APIView):
     def get(self, request):
         try:
             data = UserSerializer(request.user).data
+            data['image'] = 'http://188.93.211.127:8000' + data['image']
             return Response(data, status=status.HTTP_200_OK)
-        except Exception:
+        except Exception: 
             return Response({'status': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class GetUserDataView(generics.RetrieveAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = [AllowAny]
+class GetEventContractExView(views.APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            data = 'http://188.93.211.127:8000' + EventSerializer(Event.objects.get(pk=request.GET['id'])).data['contract_example']
+            return Response({'contract_ex': data}, status=status.HTTP_200_OK)
+        except Exception: 
+            return Response({'status': 'Bad Request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class GetProjectsView(generics.ListAPIView):
-#     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = ['status', 'id', ]
-#     search_fields = ['name', 'description']
+class UpdateUserDataView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
 
-# class GetRolesView(generics.ListAPIView):
-#     queryset = Role.objects.all()
-#     serializer_class = RoleSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = []
-#     search_fields = ['name',]
+class GetApplicationsView(generics.ListAPIView):
+    queryset = Application.objects.all()
+    serializer_class = ApplicationSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['event', 'user', ]
 
 
-# class GetEmployeesView(generics.ListAPIView):
-#     serializer_class = EmployeeSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = ['id',]
-#     search_fields = ['first_name', 'last_name', 'company_role']
-
-#     def get_queryset(self):
-#         queryset = Employee.objects.all()
-#         skill = self.request.query_params.get('skill')
-#         level = self.request.query_params.get('level')
-    
-#         if skill is not None and level is not None:
-#             skill = Skill.objects.get(pk=skill)
-#             level = int(level)
-#             updated_qs = []
-#             for emp in queryset:
-#                 for l in emp.levels.all():
-#                     if (l.skill == skill) and (l.level >= level):
-#                         updated_qs.append(emp)
-#             return list_to_queryset(Employee, updated_qs)
-#         return queryset
+class CreateApplicationView(generics.CreateAPIView):
+    queryset = Application.objects.all()
+    serializer_class = CreateApplicationSerializer
+    permission_classes = [AllowAny]
 
 
-# class GetAlmostFreeEmployeesView(generics.ListAPIView):
-#     serializer_class = EmployeeSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = ['id',]
-#     search_fields = ['first_name', 'last_name', 'company_role']
-
-#     def get_queryset(self):
-#         queryset = Employee.objects.all()
-#         startdate = date.today()
-#         enddate = startdate + timedelta(days=14)
-#         new_q = []
-#         for elem in queryset:
-#             for i in elem.get_projects:
-#                 if i.end_date <= enddate:
-#                     new_q.append(elem)
-#         queryset = list_to_queryset(Employee, new_q)
-#         skill = self.request.query_params.get('skill')
-#         level = self.request.query_params.get('level')
-    
-#         if skill is not None and level is not None:
-#             skill = Skill.objects.get(pk=skill)
-#             level = int(level)
-#             updated_qs = []
-#             for emp in queryset:
-#                 for l in emp.levels.all():
-#                     if (l.skill == skill) and (l.level >= level):
-#                         updated_qs.append(emp)
-#             return list_to_queryset(Employee, updated_qs)
-#         return queryset
+class GetStage1View(generics.ListAPIView):
+    queryset = Stage1.objects.all()
+    serializer_class = Stage1Serializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['application', 'status']
 
 
-# class GetLevelsView(generics.ListAPIView):
-#     queryset = Level.objects.all()
-#     serializer_class = LevelSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = ['skill']
-#     search_fields = []
+class GetStage2View(generics.ListAPIView):
+    queryset = Stage2.objects.all()
+    serializer_class = Stage2Serializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['application', 'status']
 
 
-# class GetSkillsView(generics.ListAPIView):
-#     queryset = Skill.objects.all()
-#     serializer_class = SkillSerializer
-#     permission_classes = [AllowAny]
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-#     filterset_fields = []
-#     search_fields = ['name', ]
+class GetStage3View(generics.ListAPIView):
+    queryset = Stage3.objects.all()
+    serializer_class = Stage3Serializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['application', 'status']
 
+
+class GetStage4View(generics.ListAPIView):
+    queryset = Stage4.objects.all()
+    serializer_class = Stage4Serializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['application', 'status']
+
+#/////////////////////////////////////////////////////
+
+class CreateStage1View(generics.UpdateAPIView):
+    queryset = Stage1.objects.all()
+    serializer_class = Stage1Serializer
+    permission_classes = [AllowAny]
+
+
+class CreateStage2View(generics.UpdateAPIView):
+    queryset = Stage2.objects.all()
+    serializer_class = Stage2Serializer
+    permission_classes = [AllowAny]
+
+
+class CreateStage3View(generics.UpdateAPIView):
+    queryset = Stage3.objects.all()
+    serializer_class = Stage3Serializer
+    permission_classes = [AllowAny]
+
+
+class CreateStage4View(generics.UpdateAPIView):
+    queryset = Stage4.objects.all()
+    serializer_class = Stage4Serializer
+    permission_classes = [AllowAny]
